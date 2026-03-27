@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Quran - AI Powered App</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        
         :root {
             --primary: #667eea;
             --secondary: #764ba2;
@@ -20,7 +22,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', 'Arabic Typesetting', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Cairo', 'Segoe UI', 'Arial Unicode MS', sans-serif;
             background: var(--light-bg);
             color: var(--text-dark);
             transition: all 0.3s ease;
@@ -87,7 +89,6 @@
         .btn-secondary:hover { background: #e67e22; transform: translateY(-2px); }
 
         .btn-dark { background: var(--text-dark); color: white; }
-
         body.dark-mode .btn-dark { background: var(--text-light); color: var(--dark-bg); }
 
         .view-section { display: none; }
@@ -114,7 +115,7 @@
 
         .surah-number { font-size: 0.9em; opacity: 0.8; margin-bottom: 10px; }
         .surah-name-en { font-size: 1.5em; font-weight: bold; margin-bottom: 8px; }
-        .surah-name-ar { font-size: 1.3em; margin-bottom: 15px; direction: rtl; text-align: right; }
+        .surah-name-ar { font-size: 1.6em; margin-bottom: 15px; direction: rtl; text-align: right; font-weight: bold; font-family: 'Cairo', sans-serif; }
         .surah-ayahs { font-size: 0.95em; opacity: 0.9; }
 
         .detail-view {
@@ -135,7 +136,7 @@
         }
 
         .surah-header h2 { font-size: 2em; margin-bottom: 10px; }
-        .surah-header-ar { font-size: 1.5em; direction: rtl; text-align: right; margin-bottom: 15px; }
+        .surah-header-ar { font-size: 2em; direction: rtl; text-align: right; margin-bottom: 15px; font-weight: bold; font-family: 'Cairo', sans-serif; }
 
         .surah-info {
             display: grid;
@@ -150,19 +151,35 @@
 
         .ayah {
             background: var(--light-bg);
-            padding: 20px;
+            padding: 25px;
             border-left: 4px solid var(--primary);
             border-radius: 5px;
-            line-height: 1.8;
         }
 
         body.dark-mode .ayah { background: rgba(255,255,255,0.05); border-left-color: var(--secondary); }
 
-        .ayah-number { font-weight: bold; color: var(--primary); margin-bottom: 10px; font-size: 0.9em; }
-        .ayah-text-ar { font-size: 1.4em; direction: rtl; text-align: right; margin-bottom: 15px; line-height: 2; }
-        .ayah-text-en { font-size: 1.05em; color: var(--text-dark); margin-bottom: 10px; }
+        .ayah-number { font-weight: bold; color: var(--primary); margin-bottom: 15px; font-size: 0.9em; }
+        
+        .ayah-text-ar { 
+            font-size: 1.8em;
+            direction: rtl;
+            text-align: right;
+            margin-bottom: 20px;
+            line-height: 2.5;
+            font-weight: 500;
+            font-family: 'Cairo', 'Traditional Arabic', 'Simplified Arabic', 'Arial Unicode MS', sans-serif;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+        }
 
-        body.dark-mode .ayah-text-en { color: var(--text-light); }
+        .ayah-text-en { 
+            font-size: 1.05em;
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+
+        body.dark-mode .ayah-text-en { color: #aaa; }
 
         .ml-section {
             background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(230, 126, 34, 0.1) 100%);
@@ -215,6 +232,7 @@
             .surahs-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
             .controls { flex-direction: column; }
             .search-box { width: 100%; }
+            .ayah-text-ar { font-size: 1.5em; }
         }
     </style>
 </head>
@@ -286,20 +304,12 @@
                 quranData = data.data;
             } catch (error) {
                 console.error('API Error:', error);
-                loadFallbackData();
             }
-        }
-
-        function loadFallbackData() {
-            quranData = [
-                { number: 1, name: 'Al-Fatiha', englishName: 'The Opening', numberOfAyahs: 7, revelationType: 'Meccan' },
-                { number: 2, name: 'Al-Baqarah', englishName: 'The Cow', numberOfAyahs: 286, revelationType: 'Medinan' },
-                { number: 3, name: 'Al-Imran', englishName: 'The Family of Imran', numberOfAyahs: 200, revelationType: 'Medinan' }
-            ];
         }
 
         async function loadSurahAyahs(surahNumber) {
             try {
+                // Fetch Arabic text and English translation
                 const response = await fetch(`${API_URL}/surah/${surahNumber}/en.asad`);
                 const data = await response.json();
                 allAyahs[surahNumber] = data.data.ayahs;
@@ -369,8 +379,8 @@
                     ${ayahs.length > 0 ? ayahs.map(ayah => `
                         <div class="ayah">
                             <div class="ayah-number">Ayah ${ayah.numberInSurah}</div>
-                            <div class="ayah-text-ar">${ayah.text}</div>
-                            <div class="ayah-text-en">${ayah.translation}</div>
+                            <div class="ayah-text-ar">${ayah.text || ''}</div>
+                            <div class="ayah-text-en"><strong>Translation:</strong> ${ayah.translation || 'Translation not available'}</div>
                         </div>
                     `).join('') : '<p>Loading Ayahs...</p>'}
                 </div>
