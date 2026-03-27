@@ -115,7 +115,7 @@
 
         .surah-number { font-size: 0.9em; opacity: 0.8; margin-bottom: 10px; }
         .surah-name-en { font-size: 1.5em; font-weight: bold; margin-bottom: 8px; }
-        .surah-name-ar { font-size: 1.6em; margin-bottom: 15px; direction: rtl; text-align: right; font-weight: bold; font-family: 'Cairo', sans-serif; }
+        .surah-name-ar { font-size: 1.6em; margin-bottom: 15px; direction: rtl; text-align: right; font-weight: bold; }
         .surah-ayahs { font-size: 0.95em; opacity: 0.9; }
 
         .detail-view {
@@ -136,7 +136,7 @@
         }
 
         .surah-header h2 { font-size: 2em; margin-bottom: 10px; }
-        .surah-header-ar { font-size: 2em; direction: rtl; text-align: right; margin-bottom: 15px; font-weight: bold; font-family: 'Cairo', sans-serif; }
+        .surah-header-ar { font-size: 2em; direction: rtl; text-align: right; margin-bottom: 15px; font-weight: bold; }
 
         .surah-info {
             display: grid;
@@ -167,7 +167,6 @@
             margin-bottom: 20px;
             line-height: 2.5;
             font-weight: 500;
-            font-family: 'Cairo', 'Traditional Arabic', 'Simplified Arabic', 'Arial Unicode MS', sans-serif;
             color: var(--primary);
             letter-spacing: 0.5px;
         }
@@ -177,6 +176,7 @@
             color: #555;
             margin-bottom: 10px;
             line-height: 1.8;
+            font-style: italic;
         }
 
         body.dark-mode .ayah-text-en { color: #aaa; }
@@ -309,10 +309,22 @@
 
         async function loadSurahAyahs(surahNumber) {
             try {
-                // Fetch Arabic text and English translation
-                const response = await fetch(`${API_URL}/surah/${surahNumber}/en.asad`);
-                const data = await response.json();
-                allAyahs[surahNumber] = data.data.ayahs;
+                // Fetch Arabic text only
+                const arabicResponse = await fetch(`${API_URL}/surah/${surahNumber}`);
+                const arabicData = await arabicResponse.json();
+                const arabicAyahs = arabicData.data.ayahs;
+
+                // Fetch English translation
+                const englishResponse = await fetch(`${API_URL}/surah/${surahNumber}/en.asad`);
+                const englishData = await englishResponse.json();
+                const englishAyahs = englishData.data.ayahs;
+
+                // Merge: Arabic text with English translation
+                allAyahs[surahNumber] = arabicAyahs.map((ayah, index) => ({
+                    numberInSurah: ayah.numberInSurah,
+                    text: ayah.text,  // Arabic text
+                    translation: englishAyahs[index]?.text || 'Translation not available'  // English translation
+                }));
             } catch (error) {
                 console.error('Error loading ayahs:', error);
             }
@@ -380,7 +392,7 @@
                         <div class="ayah">
                             <div class="ayah-number">Ayah ${ayah.numberInSurah}</div>
                             <div class="ayah-text-ar">${ayah.text || ''}</div>
-                            <div class="ayah-text-en"><strong>Translation:</strong> ${ayah.translation || 'Translation not available'}</div>
+                            <div class="ayah-text-en">${ayah.translation || 'Translation not available'}</div>
                         </div>
                     `).join('') : '<p>Loading Ayahs...</p>'}
                 </div>
