@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Quran - AI Powered App</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Mada:wght@400;700&display=swap');
+        
+        @font-face {
+            font-family: 'KFGQPC';
+            src: url('https://cdn.jsdelivr.net/npm/quran-fonts/fonts/KFGQPC-Uthmanic.ttf') format('truetype');
+        }
         
         :root {
             --primary: #667eea;
@@ -22,7 +27,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Cairo', 'Segoe UI', 'Arial Unicode MS', sans-serif;
+            font-family: 'Mada', 'Segoe UI', 'Arial Unicode MS', sans-serif;
             background: var(--light-bg);
             color: var(--text-dark);
             transition: all 0.3s ease;
@@ -115,7 +120,7 @@
 
         .surah-number { font-size: 0.9em; opacity: 0.8; margin-bottom: 10px; }
         .surah-name-en { font-size: 1.5em; font-weight: bold; margin-bottom: 8px; }
-        .surah-name-ar { font-size: 1.6em; margin-bottom: 15px; direction: rtl; text-align: right; font-weight: bold; }
+        .surah-name-ar { font-size: 1.6em; margin-bottom: 15px; direction: rtl; text-align: right; font-weight: bold; font-family: 'KFGQPC', 'Mada', sans-serif; }
         .surah-ayahs { font-size: 0.95em; opacity: 0.9; }
 
         .detail-view {
@@ -136,7 +141,7 @@
         }
 
         .surah-header h2 { font-size: 2em; margin-bottom: 10px; }
-        .surah-header-ar { font-size: 2em; direction: rtl; text-align: right; margin-bottom: 15px; font-weight: bold; }
+        .surah-header-ar { font-size: 2em; direction: rtl; text-align: right; margin-bottom: 15px; font-weight: bold; font-family: 'KFGQPC', 'Mada', sans-serif; }
 
         .surah-info {
             display: grid;
@@ -161,14 +166,15 @@
         .ayah-number { font-weight: bold; color: var(--primary); margin-bottom: 15px; font-size: 0.9em; }
         
         .ayah-text-ar { 
-            font-size: 1.8em;
+            font-size: 2em;
             direction: rtl;
             text-align: right;
             margin-bottom: 20px;
-            line-height: 2.5;
+            line-height: 2.8;
             font-weight: 500;
             color: var(--primary);
-            letter-spacing: 0.5px;
+            letter-spacing: 0.2px;
+            font-family: 'KFGQPC', 'Mada', sans-serif;
         }
 
         .ayah-text-en { 
@@ -232,7 +238,7 @@
             .surahs-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
             .controls { flex-direction: column; }
             .search-box { width: 100%; }
-            .ayah-text-ar { font-size: 1.5em; }
+            .ayah-text-ar { font-size: 1.6em; }
         }
     </style>
 </head>
@@ -309,21 +315,18 @@
 
         async function loadSurahAyahs(surahNumber) {
             try {
-                // Fetch Arabic text only
                 const arabicResponse = await fetch(`${API_URL}/surah/${surahNumber}`);
                 const arabicData = await arabicResponse.json();
                 const arabicAyahs = arabicData.data.ayahs;
 
-                // Fetch English translation
                 const englishResponse = await fetch(`${API_URL}/surah/${surahNumber}/en.asad`);
                 const englishData = await englishResponse.json();
                 const englishAyahs = englishData.data.ayahs;
 
-                // Merge: Arabic text with English translation
                 allAyahs[surahNumber] = arabicAyahs.map((ayah, index) => ({
                     numberInSurah: ayah.numberInSurah,
-                    text: ayah.text,  // Arabic text
-                    translation: englishAyahs[index]?.text || 'Translation not available'  // English translation
+                    text: ayah.text,
+                    translation: englishAyahs[index]?.text || 'Translation not available'
                 }));
             } catch (error) {
                 console.error('Error loading ayahs:', error);
